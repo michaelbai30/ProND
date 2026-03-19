@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Profile(models.Model):
@@ -22,6 +23,9 @@ class Skill(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['owner', 'name'], name='unique_skill_per_user')
         ]
+
+    def has_upcoming_sessions(self):
+        return self.sessions.filter(date_time__gte=timezone.now()).exists()
 
     def __str__(self):
         return f"{self.name}"

@@ -21,8 +21,14 @@ class Session(models.Model):
         if self.skill_id and self.host_id and self.skill.owner != self.host:
             raise ValidationError("You can only create sessions for your own skills.")
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.title} ({self.skill.name})"
+        if self.skill_id:
+            return f"{self.title} ({self.skill.name})"
+        return self.title
 
 
 class SessionMembership(models.Model):

@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 load_dotenv()
 
@@ -62,18 +63,18 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Redirect settings
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/sessions/'
 LOGOUT_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -82,7 +83,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -156,6 +157,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SOCIALACCOUNT_LOGIN_ON_GET = True # skips "are you sure you want to sign in ..." page
 ACCOUNT_EMAIL_VERIFICATION = "none" # skips sending email
 ACCOUNT_EMAIL_REQUIRED = True
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+}
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
