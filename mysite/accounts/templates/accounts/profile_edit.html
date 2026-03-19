@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile — ProND{% endblock %}
+
+{% block content %}
+<h2>Edit Profile</h2>
+
+<h4>Bio</h4>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="save_bio">
+    {{ profile_form.as_p }}
+    <button type="submit" class="btn btn-primary">Save Bio</button>
+</form>
+
+<hr>
+
+<h4>Skills</h4>
+{% if skills %}
+<ul>
+    {% for skill in skills %}
+    <li>
+        <strong>{{ skill.name }}</strong>
+        {% if skill.description %} — {{ skill.description }}{% endif %}
+        <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="remove_skill">
+            <input type="hidden" name="skill_id" value="{{ skill.id }}">
+            <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No skills added yet.</p>
+{% endif %}
+
+<h5>Add a Skill</h5>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add_skill">
+    {{ skill_form.as_p }}
+    <button type="submit" class="btn btn-success">Add Skill</button>
+</form>
+{% endblock %}
