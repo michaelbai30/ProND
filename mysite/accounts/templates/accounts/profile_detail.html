@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.get_full_name|default:profile_user.username }} — ProND{% endblock %}
+
+{% block content %}
+<h2>{{ profile_user.get_full_name|default:profile_user.username }}</h2>
+
+<h4>Bio</h4>
+<p>{{ profile.bio|default:"No bio yet." }}</p>
+
+<h4>Skills</h4>
+{% if skills %}
+<ul>
+    {% for skill in skills %}
+    <li>
+        <strong>{{ skill.name }}</strong>
+        {% if skill.description %} — {{ skill.description }}{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No skills listed.</p>
+{% endif %}
+{% endblock %}

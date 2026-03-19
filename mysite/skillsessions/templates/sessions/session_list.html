@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Sessions — ProND{% endblock %}
+
+{% block content %}
+<h2>Upcoming Sessions</h2>
+
+{% if sessions %}
+{% for session in sessions %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">
+            <a href="{% url 'session_detail' session.pk %}">{{ session.title }}</a>
+        </h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ session.skill.name }}</h6>
+        <p class="card-text">
+            <strong>Host:</strong>
+            <a href="{% url 'profile_detail' session.host.id %}">
+                {{ session.host.get_full_name|default:session.host.username }}
+            </a><br>
+            <strong>When:</strong> {{ session.date_time }}<br>
+            <strong>Where:</strong> {{ session.location }}<br>
+            <strong>Spots:</strong> {{ session.capacity }} total
+        </p>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<p>No upcoming sessions. <a href="{% url 'session_create' %}">Create one!</a></p>
+{% endif %}
+{% endblock %}
