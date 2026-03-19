@@ -1,7 +1,13 @@
-from django.test import TestCase
+# tests are AI gen, please add more as needed or delete these.
+
+from datetime import timedelta
+from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.urls import reverse
+from django.utils import timezone
 from .models import Profile, Skill
+
 
 
 class ProfileModelTest(TestCase):
@@ -54,3 +60,104 @@ class SkillModelTest(TestCase):
         Skill.objects.create(owner=self.user, name='Python')
         Skill.objects.create(owner=self.other_user, name='Python')
         self.assertEqual(Skill.objects.filter(name='Python').count(), 2)
+
+
+class ProfileViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass123')
+
+    def test_profile_view_requires_login(self):
+        response = self.client.get(reverse('profile_view'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('login', response.url)
+
+    def test_profile_view_auto_creates_profile(self):
+        self.client.login(username='testuser', password='testpass123')
+        self.assertFalse(Profile.objects.filter(user=self.user).exists())
+        response = self.client.get(reverse('profile_view'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Profile.objects.filter(user=self.user).exists())
+
+    def test_profile_edit_save_bio(self):
+        self.client.login(username='testuser', password='testpass123')
+        Profile.objects.create(user=self.user)
+        response = self.client.post(reverse('profile_edit'), {
+            'action': 'save_bio',
+            'bio': 'Hello world',
+        })
+        self.assertEqual(response.status_code, 302)
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.bio, 'Hello world')
+
+    def test_profile_edit_add_skill(self):
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.post(reverse('profile_edit'), {
+            'action': 'add_skill',
+            'name': 'Python',
+            'description': 'Web development',
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Skill.objects.filter(owner=self.user, name='Python').exists())
+
+    def test_profile_edit_add_duplicate_skill_rejected(self):
+        self.client.login(username='testuser', password='testpass123')
+        Skill.objects.create(owner=self.user, name='Python')
+        response = self.client.post(reverse('profile_edit'), {
+            'action': 'add_skill',
+            'name': 'Python',
+            'description': 'Again',
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Skill.objects.filter(owner=self.user, name='Python').count(), 1)
+
+    def test_profile_edit_remove_skill(self):
+        self.client.login(username='testuser', password='testpass123')
+        skill = Skill.objects.create(owner=self.user, name='Python')
+        response = self.client.post(reverse('profile_edit'), {
+            'action': 'remove_skill',
+            'skill_id': skill.id,
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Skill.objects.filter(id=skill.id).exists())
+
+    def test_profile_edit_remove_skill_with_active_sessions_blocked(self):
+        from skillsessions.models import Session
+        self.client.login(username='testuser', password='testpass123')
+        skill = Skill.objects.create(owner=self.user, name='Python')
+        Session.objects.create(
+            skill=skill, host=self.user, title='Test',
+            location='Room 1', date_time=timezone.now() + timedelta(days=1),
+            duration_minutes=60, capacity=5,
+        )
+        response = self.client.post(reverse('profile_edit'), {
+            'action': 'remove_skill',
+            'skill_id': skill.id,
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Skill.objects.filter(id=skill.id).exists())
+
+    def test_profile_edit_cannot_remove_other_users_skill(self):
+        self.client.login(username='testuser', password='testpass123')
+        other_user = User.objects.create_user(username='other', password='testpass123')
+        skill = Skill.objects.create(owner=other_user, name='Python')
+        response = self.client.post(reverse('profile_edit'), {
+            'action': 'remove_skill',
+            'skill_id': skill.id,
+        })
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Skill.objects.filter(id=skill.id).exists())
+
+    def test_profile_detail_shows_other_user(self):
+        self.client.login(username='testuser', password='testpass123')
+        other_user = User.objects.create_user(username='other', password='testpass123')
+        Profile.objects.create(user=other_user, bio='Other bio')
+        response = self.client.get(reverse('profile_detail', args=[other_user.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Other bio')
+
+    def test_profile_detail_requires_login(self):
+        other_user = User.objects.create_user(username='other', password='testpass123')
+        response = self.client.get(reverse('profile_detail', args=[other_user.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('login', response.url)

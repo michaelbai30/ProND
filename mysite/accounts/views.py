@@ -6,11 +6,13 @@ from django.utils import timezone
 from .models import Profile, Skill
 from .forms import ProfileForm, SkillForm
 def login_page(request):
+    if request.user.is_authenticated:
+        return redirect('session_list')
     return render(request, "accounts/login.html")
 
 
 @login_required
-def profile_view(request):
+def profile_view(request): # view own profile - get profile info + Skills
     profile, created = Profile.objects.get_or_create(user=request.user)
     skills = Skill.objects.filter(owner=request.user)
     return render(request, 'accounts/profile_view.html', {
@@ -20,7 +22,7 @@ def profile_view(request):
 
 
 @login_required
-def profile_edit(request):
+def profile_edit(request):  # edit own profile - update bio, add/remove skills
     profile, created = Profile.objects.get_or_create(user=request.user)
     skills = Skill.objects.filter(owner=request.user)
     profile_form = ProfileForm(instance=profile)
@@ -29,18 +31,18 @@ def profile_edit(request):
     if request.method == 'POST':
         action = request.POST.get('action')
 
-        if action == 'save_bio':
+        if action == 'save_bio': # update bio, profile only
             profile_form = ProfileForm(request.POST, instance=profile)
             if profile_form.is_valid():
                 profile_form.save()
                 messages.success(request, 'Profile updated.')
                 return redirect('profile_edit')
 
-        elif action == 'add_skill':
+        elif action == 'add_skill': # add skill - skill name + description, must be unique per user
             skill_form = SkillForm(request.POST)
             if skill_form.is_valid():
                 name = skill_form.cleaned_data['name']
-                if Skill.objects.filter(owner=request.user, name=name).exists():
+                if Skill.objects.filter(owner=request.user, name=name).exists(): 
                     messages.error(request, f'You already have a skill called "{name}".')
                 else:
                     skill = skill_form.save(commit=False)
@@ -49,7 +51,7 @@ def profile_edit(request):
                     messages.success(request, f'Skill "{skill.name}" added.')
                 return redirect('profile_edit')
 
-        elif action == 'remove_skill':
+        elif action == 'remove_skill': # remove skill - blocking if upcoming sessions exist for skill. change in future?
             skill_id = request.POST.get('skill_id')
             skill = get_object_or_404(Skill, id=skill_id, owner=request.user)
             if skill.has_upcoming_sessions():
@@ -71,7 +73,7 @@ def profile_edit(request):
 
 
 @login_required
-def profile_detail(request, user_id):
+def profile_detail(request, user_id): # view other profile - pretty basic, read only
     profile_user = get_object_or_404(User, id=user_id)
     profile = Profile.objects.filter(user=profile_user).first()
     skills = Skill.objects.filter(owner=profile_user)

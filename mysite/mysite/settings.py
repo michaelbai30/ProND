@@ -63,12 +63,13 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Redirect settings
+LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/sessions/'
 LOGOUT_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # docs say put this directly after SecurityMiddleware and above all else
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -156,7 +157,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Login Options
 SOCIALACCOUNT_LOGIN_ON_GET = True # skips "are you sure you want to sign in ..." page
 ACCOUNT_EMAIL_VERIFICATION = "none" # skips sending email
-ACCOUNT_EMAIL_REQUIRED = True
 
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',

@@ -5,14 +5,14 @@ from django.core.exceptions import ValidationError
 from accounts.models import Skill
 
 
-class Session(models.Model):
+class Session(models.Model): # session model - meeting for skill, fk to Skill and User/host + descriptor attributes
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='sessions')
     host = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hosted_sessions')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     location = models.CharField(max_length=200)
     date_time = models.DateTimeField()
-    duration = models.DurationField()
+    duration_minutes = models.PositiveIntegerField(validators=[MinValueValidator(5)])
     capacity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -31,12 +31,12 @@ class Session(models.Model):
         return self.title
 
 
-class SessionMembership(models.Model):
+class SessionMembership(models.Model): # model for tracking which users are attending which sessions. fk to Session and User, unique constraint to prevent dupes
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='memberships')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='session_memberships')
     joined_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
+    class Meta: # unique constraint for no dupes
         constraints = [
             models.UniqueConstraint(fields=['session', 'user'], name='unique_session_membership')
         ]

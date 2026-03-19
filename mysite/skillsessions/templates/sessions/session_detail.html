@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}{{ session.title }} — ProND{% endblock %}
+
+{% block content %}
+<h2>{{ session.title }}</h2>
+<p class="text-muted">
+    Teaching <strong>{{ session.skill.name }}</strong> ·
+    Hosted by
+    <a href="{% url 'profile_detail' session.host.id %}">
+        {{ session.host.get_full_name|default:session.host.username }}
+    </a>
+</p>
+
+{% if session.description %}
+<p>{{ session.description }}</p>
+{% endif %}
+
+<ul>
+    <li><strong>When:</strong> {{ session.date_time }}</li>
+    <li><strong>Duration:</strong> {{ session.duration_minutes }} minutes</li>
+    <li><strong>Where:</strong> {{ session.location }}</li>
+    <li><strong>Spots:</strong> {{ membership_count }} / {{ session.capacity }}</li>
+</ul>
+
+{% if is_past %}
+    <div class="alert alert-secondary">This session has passed.</div>
+{% elif is_host %}
+    <div class="alert alert-info">You are hosting this session.</div>
+{% elif is_member %}
+    <form method="post" action="{% url 'session_leave' session.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning">Leave Session</button>
+    </form>
+{% elif is_full %}
+    <div class="alert alert-warning">This session is full.</div>
+{% else %}
+    <form method="post" action="{% url 'session_join' session.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Join Session</button>
+    </form>
+{% endif %}
+
+<hr>
+
+<h4>Attendees ({{ membership_count }})</h4>
+{% if memberships %}
+<ul>
+    {% for membership in memberships %}
+    <li>
+        <a href="{% url 'profile_detail' membership.user.id %}">
+            {{ membership.user.get_full_name|default:membership.user.username }}
+        </a>
+        <small class="text-muted">· Joined {{ membership.joined_at }}</small>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No attendees yet.</p>
+{% endif %}
+{% endblock %}

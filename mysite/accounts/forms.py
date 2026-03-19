@@ -2,7 +2,7 @@ from django import forms
 from .models import Profile, Skill
 
 
-class ProfileForm(forms.ModelForm):
+class ProfileForm(forms.ModelForm): # form for editing your profile - bio only (for now)
     class Meta:
         model = Profile
         fields = ['bio']
@@ -11,7 +11,7 @@ class ProfileForm(forms.ModelForm):
         }
 
 
-class SkillForm(forms.ModelForm):
+class SkillForm(forms.ModelForm): # form for editing your skills, put name + description
     class Meta:
         model = Skill
         fields = ['name', 'description']
