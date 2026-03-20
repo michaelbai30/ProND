@@ -1,22 +1,56 @@
+{% extends "base.html" %}
 {% load socialaccount %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login Page</title>
-</head>
-<body>
+{% load static %}
 
-<h1>Welcome to ProND</h1>
-<h2> Landing Page </h2>
-{% if user.is_authenticated %}
-    <p>Logged in as: {{user.username}}</p>
-    <form method="post" action="{% url 'account_logout' %}">
-        {% csrf_token %}
-        <button type="submit"> Log out</button>
-    </form>
-{% else %}
-    <a href="{% provider_login_url 'google' %}"> Log in with Google </a>
+{% block title %}ProND{% endblock %}
 
-{% endif %}
-</body>
-</html>
+{% block navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'session_list' %}"> Pro
+            <img src="{% static 'assets/ND_logo_sm.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class = "nav-link px-3" href="{% url 'about' %}"> About </a>
+                </li>
+                {% if not user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm mt-1" href="{% provider_login_url 'google' %}">Login</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <span class="nav-link text-light me-auto">{{user.username}}</span>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'account_logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-light btn-sm mt-1">Log out</button>
+                        </form>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock navbar %}
+
+{% block content %}
+<div class="text-center py-5">
+    <img src="{% static 'assets/ND_logo.png' %}" alt="ND Logo" class="mb-4 img-fluid" style="max-height: 200px;">
+    <h1 class="display-3 fw-bold text-primary">Welcome to ProND</h1>
+    <p class="text-secondary fs-4">Your Campus-wide Skill Sharing Marketplace!</p>
+    
+    <div class="mt-4">
+        {% if not user.is_authenticated %}
+            <a href="{% provider_login_url 'google' %}" class="btn btn-danger rounded-pill">Log in with Google</a>
+        {% else %}
+            <a href="{% url 'session_list' %}" class="btn btn-primary rounded-pill">Go to Sessions</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
