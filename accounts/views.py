@@ -1,3 +1,4 @@
+# hello
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -10,6 +11,8 @@ def login_page(request):
         return redirect('session_list')
     return render(request, "accounts/login.html")
 
+def about_page(request):
+    return render(request, 'accounts/about.html')
 
 @login_required
 def profile_view(request): # view own profile - get profile info + Skills

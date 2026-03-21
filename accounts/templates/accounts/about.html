@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}About ProND{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 p-4 mb-5 bg-white">
+                <h1 class="display-4 fw-bold text-success">Skills for the Irish, By the Irish</h1>
+                <p class="lead mt-4">
+                    ProND is a student-led marketplace for exchanging knowledge, help, and hobbies 
+                    exclusively within the <strong>Notre Dame</strong> family.
+                </p>
+                <p> Our mission is to connect fellow students with each other through a need or a shared common interest.
+                </p>
+                <p>
+                    With ProND, customers can securely book appointments or services from various verified skillsharers who are willing to offer a service.
+                </p>
+                <p> Want to learn something new like the piano or need some art pieces for your new dorm room? <br>ProND is the answer you've been looking for!</p>
+            </div>
+            <br>
+            <h3 class="mb-4 text-primary">ProND Guarantees</h3>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 p-2 bg-light rounded-3">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary"> Community-Led Safety</h5>
+                            <p class="card-text small text-muted">Both skillsharers and customers are verified ND students, meaning you're always working with a peer you can trust!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 p-2 bg-light rounded-3">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary"> Flexible Exchanges</h5>
+                            <p class="card-text small text-muted">Pay with cash, trade a skill, or just say "Go Irish!" We believe that a small favor can go a long way.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 p-2 bg-light rounded-3">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary"> Meet New People</h5>
+                            <p class="card-text small text-muted">ProND is a fantastic place to make a new friend or grow your campus connections through shared passions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 p-2 bg-light rounded-3">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary"> Empowering Student Talent</h5>
+                            <p class="card-text small text-muted">Turn your hobbies and skills into professional services and help your peers succeed while building your portfolio.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <p class="text-success"><strong>Go Irish! </strong></p>
+            <a href="{% url 'login' %}" class="btn btn-outline-primary mt-1">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
