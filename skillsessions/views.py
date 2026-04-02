@@ -222,4 +222,4 @@ def cancel_session(request, session_id):
     session.cancelled_at = timezone.now()
     session.save()
 
-    return redirect("session_detail", session_id=session.id)
+    return redirect("session_detail", pk=session.id)
